@@ -24,7 +24,7 @@ export default function ClienteCard({ cliente }: { cliente: Cliente }) {
           <h2 className="text-white font-semibold text-sm leading-tight">{cliente.dominio}</h2>
         </div>
         {cliente.url && (
-          <a href={cliente.url} target="_blank" rel="noopener noreferrer"
+          <a href={cliente.url?.startsWith('http') ? cliente.url : `https://${cliente.url}`} target="_blank" rel="noopener noreferrer"
             className="text-gray-400 hover:text-white transition-colors shrink-0">
             <ExternalLink size={15} />
           </a>

@@ -89,17 +89,24 @@ export default function AdminPage() {
 
   const guardar = async () => {
     setGuardando(true)
+    const urlFinal = clienteActual.url
+      ? clienteActual.url.startsWith('http')
+        ? clienteActual.url
+        : `https://${clienteActual.url}`
+      : null
+
+    const dataAGuardar = { ...clienteActual, url: urlFinal }
     if (modal === 'crear') {
       await fetch('/api/clientes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(clienteActual),
+        body: JSON.stringify(dataAGuardar),
       })
     } else {
       await fetch(`/api/clientes/${editandoId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(clienteActual),
+        body: JSON.stringify(dataAGuardar),
       })
     }
     await fetchClientes()
