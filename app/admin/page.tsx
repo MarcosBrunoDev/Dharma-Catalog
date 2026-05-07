@@ -36,6 +36,13 @@ export default function AdminPage() {
   const [editandoId, setEditandoId] = useState<number | null>(null)
   const [servicioInput, setServicioInput] = useState('')
   const [guardando, setGuardando] = useState(false)
+  const [filtroUrl, setFiltroUrl] = useState<'todos' | 'con' | 'sin'>('todos')
+  const [clientesOriginales, setClientesOriginales] = useState<Cliente[]>([])
+  const clientesFiltrados = clientesOriginales.filter(c => {
+    if (filtroUrl === 'con') return c.url
+    if (filtroUrl === 'sin') return !c.url
+    return true
+  })
 
   const fetchClientes = useCallback(async () => {
     setCargando(true)
@@ -43,7 +50,7 @@ export default function AdminPage() {
     if (busqueda) params.set('busqueda', busqueda)
     const res = await fetch(`/api/clientes?${params.toString()}`)
     const data = await res.json()
-    setClientes(data.clientes)
+    setClientesOriginales(data.clientes)
     setCargando(false)
   }, [busqueda])
 
@@ -124,7 +131,7 @@ export default function AdminPage() {
     <div className="min-h-screen bg-gray-900 text-white">
       <div className="border-b border-gray-800 px-6 py-4 flex items-center gap-3">
         <h1 className="text-lg font-bold">Admin — Clientes</h1>
-        <span className="text-sm text-gray-400">{clientes.length} clientes</span>
+        <span className="text-sm text-gray-400">{clientesFiltrados.length} clientes</span>
         <div className="ml-auto flex items-center gap-3">
           <button onClick={abrirCrear}
             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-xl text-sm font-semibold transition-colors">
@@ -149,6 +156,21 @@ export default function AdminPage() {
           />
         </div>
 
+        <div className="flex gap-2">
+          {(['todos', 'con', 'sin'] as const).map((f) => (
+            <button
+              key={f}
+              onClick={() => setFiltroUrl(f)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${filtroUrl === f
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-800 text-gray-400 hover:text-white border border-gray-700'
+                }`}
+            >
+              {f === 'todos' ? 'Todos' : f === 'con' ? 'Con URL' : 'Sin URL'}
+            </button>
+          ))}
+        </div>
+
         {cargando ? (
           <p className="text-gray-500 text-center py-10">Cargando...</p>
         ) : (
@@ -164,7 +186,7 @@ export default function AdminPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-700">
-                {clientes.map((c) => (
+                {clientesFiltrados.map((c) => (
                   <tr key={c.id} className="hover:bg-gray-800 transition-colors">
                     <td className="px-4 py-3">
                       {c.activo
