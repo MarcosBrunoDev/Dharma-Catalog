@@ -54,46 +54,49 @@ export default function CatalogoPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
-      <div className="border-b border-gray-800 px-6 py-4 flex items-center gap-3">
-        <Users size={20} className="text-blue-400" />
-        <h1 className="text-lg font-bold">Catálogo de Clientes</h1>
-        <span className="ml-auto text-sm text-gray-400">{clientes.length} clientes</span>
-      </div>
-
-      <div className="flex h-[calc(100vh-61px)]">
-        <aside className="w-64 shrink-0 border-r border-gray-800 p-4 overflow-y-auto">
-          <Filtros
-            rubros={rubros}
-            ubicaciones={ubicaciones}
-            rubroActivo={rubroActivo}
-            ubicacionActiva={ubicacionActiva}
-            onRubro={setRubroActivo}
-            onUbicacion={setUbicacionActiva}
-            onLimpiar={limpiarFiltros}
-          />
-        </aside>
-
-        <main className="flex-1 p-6 overflow-y-auto flex flex-col gap-4">
-          <Buscador valor={busqueda} onChange={setBusqueda} />
-
-          {cargando ? (
-            <div className="flex items-center justify-center h-full text-gray-500">
-              Cargando...
-            </div>
-          ) : clientes.length === 0 ? (
-            <div className="flex items-center justify-center h-full text-gray-500">
-              No se encontraron clientes
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              {clientes.map((cliente) => (
-                <ClienteCard key={cliente.id} cliente={cliente} />
-              ))}
-            </div>
-          )}
-        </main>
-      </div>
+<div className="min-h-screen bg-gray-900 text-white">
+  <div className="sticky top-0 z-10 border-b border-gray-800 bg-gray-900 px-6 py-4 flex items-center gap-4">
+    <div className="flex items-center gap-3 shrink-0">
+      <Users size={20} className="text-blue-400" />
+      <h1 className="text-lg font-bold">Catálogo de Clientes</h1>
     </div>
+    <div className="flex-1">
+      <Buscador valor={busqueda} onChange={setBusqueda} />
+    </div>
+    <span className="text-sm text-gray-400 shrink-0">{clientes.length} clientes</span>
+  </div>
+
+  <div className="flex h-[calc(100vh-61px)]">
+    <aside className="w-64 shrink-0 border-r border-gray-800 p-4 overflow-y-auto">
+      <Filtros
+        rubros={rubros}
+        ubicaciones={ubicaciones}
+        rubroActivo={rubroActivo}
+        ubicacionActiva={ubicacionActiva}
+        onRubro={setRubroActivo}
+        onUbicacion={setUbicacionActiva}
+        onLimpiar={limpiarFiltros}
+      />
+    </aside>
+
+    <main className="flex-1 p-6 overflow-y-auto flex flex-col gap-4">
+      {cargando ? (
+        <div className="flex items-center justify-center h-full text-gray-500">
+          Cargando...
+        </div>
+      ) : clientes.length === 0 ? (
+        <div className="flex items-center justify-center h-full text-gray-500">
+          No se encontraron clientes
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          {clientes.map((cliente) => (
+            <ClienteCard key={cliente.id} cliente={cliente} />
+          ))}
+        </div>
+      )}
+    </main>
+  </div>
+</div>
   )
 }
