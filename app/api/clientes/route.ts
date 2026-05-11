@@ -9,21 +9,35 @@ export async function GET(request: NextRequest) {
   const rubro = searchParams.get('rubro') || ''
   const ubicacion = searchParams.get('ubicacion') || ''
 
-  const clientes = await prisma.cliente.findMany({
-    where: {
-      AND: [
-        busqueda ? {
-          OR: [
-            { dominio: { contains: busqueda, mode: 'insensitive' } },
-            { servicios: { contains: busqueda, mode: 'insensitive' } },
-          ]
-        } : {},
-        rubro ? { rubro: { contains: rubro, mode: 'insensitive' } } : {},
-        ubicacion ? { ubicacion: { contains: ubicacion, mode: 'insensitive' } } : {},
-      ]
-    },
+  const todos = await prisma.cliente.findMany({
     orderBy: { dominio: 'asc' }
   })
+
+  let clientesFiltrados = todos
+
+  if (busqueda) {
+    const b = busqueda.toLowerCase()
+    clientesFiltrados = clientesFiltrados.filter(c =>
+      c.dominio.toLowerCase().includes(b) ||
+      c.servicios.toLowerCase().includes(b) ||
+      c.rubro.toLowerCase().includes(b) ||
+      c.ubicacion.toLowerCase().includes(b) ||
+      (c.notas?.toLowerCase().includes(b) ?? false) ||
+      c.serviciosPrincipales.some(s => s.toLowerCase().includes(b))
+    )
+  }
+
+  if (rubro) {
+    clientesFiltrados = clientesFiltrados.filter(c =>
+      c.rubro.toLowerCase().includes(rubro.toLowerCase())
+    )
+  }
+
+  if (ubicacion) {
+    clientesFiltrados = clientesFiltrados.filter(c =>
+      c.ubicacion.toLowerCase().includes(ubicacion.toLowerCase())
+    )
+  }
 
   const rubros = await prisma.cliente.findMany({
     select: { rubro: true },
@@ -38,7 +52,7 @@ export async function GET(request: NextRequest) {
   })
 
   return NextResponse.json({
-    clientes,
+    clientes: clientesFiltrados,
     rubros: rubros.map(r => r.rubro).filter(Boolean),
     ubicaciones: ubicaciones.map(u => u.ubicacion).filter(Boolean),
   })
